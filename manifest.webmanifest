@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "পারিবারিক হিসাব",
+  "short_name": "পারিবারিক হিসাব",
+  "description": "জমা, খরচ, টাকা উঠানো ও ব্যালেন্সের পারিবারিক হিসাব",
+  "lang": "bn",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7fb",
+  "theme_color": "#17365d",
+  "icons": [
+    {"src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}
