@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17365d">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="default">
+ <meta name="apple-mobile-web-app-title" content="পারিবারিক হিসাব">
+ <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+ <link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>পারিবারিক হিসাব</title>
+<style>
+:root{--navy:#17365d;--blue:#eaf2fb;--green:#e5f4e8;--red:#fff0ed;--gold:#fff6dc;--ink:#182230;--muted:#64748b;--line:#e4eaf1;--bg:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Sans Bengali",sans-serif}
+header{background:linear-gradient(135deg,#17365d,#24588b);color:white;padding:20px 16px 18px;position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #102b4a25}
+header h1{font-size:21px;margin:0 0 5px}header p{margin:0;color:#d9e8f8;font-size:12px}
+main{max-width:760px;margin:auto;padding:14px 12px 90px}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 14px}
+nav button{border:1px solid var(--line);background:white;border-radius:12px;padding:10px 4px;font-size:12px;color:#344256}
+nav button.active{background:var(--navy);color:white;border-color:var(--navy)}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
+.card{border-radius:15px;padding:13px;background:white;border:1px solid var(--line);min-width:0}
+.card small{color:var(--muted);display:block;font-size:12px}.card strong{font-size:20px;display:block;margin-top:6px;overflow-wrap:anywhere}
+.card.blue{background:var(--blue)}.card.green{background:var(--green)}.card.red{background:var(--red)}.card.gold{background:var(--gold)}
+.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:13px}
+h2{font-size:16px;margin:0 0 12px}.muted{color:var(--muted);font-size:12px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}
+input,select,textarea{width:100%;border:1px solid #cfd8e3;border-radius:10px;padding:11px 10px;font:inherit;font-size:14px;background:white;color:var(--ink);min-height:43px}
+textarea{min-height:70px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button.primary,button.secondary,button.danger{border:0;border-radius:11px;padding:12px 14px;font:inherit;font-weight:650;cursor:pointer}
+button.primary{background:var(--navy);color:white;width:100%;margin-top:13px}
+button.secondary{background:var(--blue);color:var(--navy)}
+button.danger{background:var(--red);color:#a42c1d}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hidden{display:none!important}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:520px}
+th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f3f6fa;color:#42536a;position:sticky;top:0}
+.tablewrap{overflow:auto;max-height:420px}
+.pill{font-size:11px;padding:3px 7px;border-radius:20px;background:#edf2f7;white-space:nowrap}
+.item-actions{display:flex;gap:5px}.item-actions button{font-size:11px;padding:5px 7px;border:0;border-radius:7px;background:#eef2f7}
+.note{background:#f0f6ff;border-radius:10px;padding:10px;font-size:12px;color:#36516f;line-height:1.6}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:10px}
+@media(min-width:600px){.cards{grid-template-columns:repeat(4,1fr)}nav{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>📒 পারিবারিক হিসাব</h1><p>জমা • খরচ • টাকা উঠানো • ব্যালেন্স</p></header>
+<main>
+<nav id="nav">
+<button class="active" data-tab="home">🏠 হোম</button>
+<button data-tab="income">＋ টাকা জমা</button>
+<button data-tab="expense">🛒 খরচ</button>
+<button data-tab="transfer">⇄ টাকা উঠানো</button>
+<button data-tab="reports">📊 রিপোর্ট</button>
+<button data-tab="settings">⚙️ তালিকা</button>
+</nav>
+<section id="home" class="tab">
+<div class="cards">
+<div class="card blue"><small>মোট জমা</small><strong id="totalIn">৳০</strong></div>
+<div class="card red"><small>মোট খরচ</small><strong id="totalOut">৳০</strong></div>
+<div class="card gold"><small>উত্তোলন চার্জ</small><strong id="totalFee">৳০</strong></div>
+<div class="card green"><small>অবশিষ্ট ব্যালেন্স</small><strong id="balance">৳০</strong></div>
+</div>
+<div class="panel"><h2>মাধ্যমভিত্তিক ব্যালেন্স</h2><div class="tablewrap"><table><thead><tr><th>মাধ্যম</th><th>জমা</th><th>পেয়েছে</th><th>উঠানো</th><th>খরচ</th><th>ব্যালেন্স</th></tr></thead><tbody id="methodRows"></tbody></table></div></div>
+<div class="panel"><div class="row"><h2>সাম্প্রতিক লেনদেন</h2><span class="muted">সর্বশেষ ৮টি</span></div><div id="recent"></div></div>
+<div class="note">টাকা এক ওয়ালেট থেকে অন্য মাধ্যমে নিলে সেটি খরচ নয়। উত্তোলনের চার্জ থাকলে শুধু চার্জটি মোট ব্যালেন্স থেকে বাদ হবে।</div>
+</section>
+
+<section id="income" class="tab hidden">
+<div class="panel"><h2>＋ নতুন টাকা জমা</h2>
+<form id="incomeForm">
+<div class="grid2"><div><label>তারিখ</label><input type="date" id="inDate" required></div><div><label>জমার মাধ্যম</label><select id="inMethod"></select></div></div>
+<label>জমার বিবরণ / কার কাছ থেকে</label><input id="inDesc" placeholder="যেমন: বাবার কাছ থেকে / নিজের টাকা">
+<div class="grid2"><div><label>জমার পরিমাণ (৳)</label><input type="number" id="inAmount" min="0.01" step="0.01" required></div><div><label>ট্রানজেকশন আইডি</label><input id="inRef" placeholder="ঐচ্ছিক"></div></div>
+<label>মন্তব্য</label><input id="inNote" placeholder="ঐচ্ছিক">
+<button class="primary">জমা সংরক্ষণ করুন</button></form></div>
+<div class="panel"><h2>জমার তালিকা</h2><div id="incomeList"></div></div>
+</section>
+
+<section id="expense" class="tab hidden">
+<div class="panel"><h2>🛒 নতুন খরচ যোগ</h2>
+<form id="expenseForm">
+<div class="grid2"><div><label>তারিখ</label><input type="date" id="exDate" required></div><div><label>খরচের বিভাগ</label><select id="exCategory"></select></div></div>
+<label>পণ্য / কাজের নাম</label><input id="exProduct" list="productOptions" placeholder="পণ্যের নাম লিখুন বা তালিকা থেকে বাছুন" required><datalist id="productOptions"></datalist>
+<label>পণ্যের বিস্তারিত বিবরণ</label><input id="exDetail" placeholder="যেমন: মিনিকেট চাল ২৫ কেজির বস্তা">
+<div class="grid2"><div><label>পরিমাণ</label><input type="number" id="exQty" min="0.001" step="any" placeholder="যেমন: ২৫"></div><div><label>একক</label><select id="exUnit"><option>কেজি</option><option>গ্রাম</option><option>লিটার</option><option>পিস</option><option>প্যাকেট</option><option>বস্তা</option><option>মন</option><option>ডজন</option><option>ঘণ্টা</option><option>দিন</option><option>সেট</option><option>অন্যান্য</option></select></div></div>
+<div class="grid2"><div><label>একক দর (৳)</label><input type="number" id="exRate" min="0" step="0.01" placeholder="একক প্রতি দাম"></div><div><label>মোট টাকা (৳)</label><input type="number" id="exAmount" min="0.01" step="0.01" required placeholder="নিজে লিখুন বা অটো হিসাব"></div></div>
+<div class="grid2"><div><label>পরিশোধের মাধ্যম</label><select id="exMethod"></select></div><div><label>কাকে / কোথায় দেওয়া</label><input id="exWho" placeholder="দোকান / ব্যক্তি"></div></div>
+<div class="grid2"><div><label>ট্রানজেকশন / বিল নম্বর</label><input id="exRef"></div><div><label>মন্তব্য</label><input id="exNote"></div></div>
+<button class="primary">খরচ সংরক্ষণ করুন</button></form></div>
+<div class="panel"><h2>খরচের তালিকা</h2><div class="grid2"><div><label>বিভাগ দিয়ে ফিল্টার</label><select id="filterCat"></select></div><div><label>পণ্য খুঁজুন</label><input id="filterProduct" placeholder="পণ্যের নাম"></div></div><div id="expenseList"></div></div>
+</section>
+
+<section id="transfer" class="tab hidden">
+<div class="panel"><h2>⇄ টাকা উঠানো / মাধ্যম পরিবর্তন</h2>
+<form id="transferForm">
+<div class="grid2"><div><label>তারিখ</label><input type="date" id="trDate" required></div><div><label>যে মাধ্যম থেকে উঠিয়েছেন</label><select id="trFrom"></select></div></div>
+<div class="grid2"><div><label>যে মাধ্যমে পেয়েছেন</label><select id="trTo"></select></div><div><label>উঠানো টাকা (৳)</label><input type="number" id="trAmount" min="0.01" step="0.01" required></div></div>
+<div class="grid2"><div><label>উত্তোলন চার্জ (৳)</label><input type="number" id="trFee" min="0" step="0.01" value="0"></div><div><label>ট্রানজেকশন আইডি</label><input id="trRef"></div></div>
+<label>মন্তব্য</label><input id="trNote" placeholder="ঐচ্ছিক">
+<button class="primary">উত্তোলন সংরক্ষণ করুন</button></form></div>
+<div class="panel"><h2>উত্তোলনের তালিকা</h2><div id="transferList"></div></div>
+</section>
+
+<section id="reports" class="tab hidden">
+<div class="panel"><h2>📊 হিসাব রিপোর্ট</h2>
+<div class="grid2"><div><label>শুরুর তারিখ</label><input type="date" id="reportFrom"></div><div><label>শেষ তারিখ</label><input type="date" id="reportTo"></div></div>
+<button class="secondary" id="runReport" style="width:100%;margin-top:10px">রিপোর্ট দেখুন</button>
+<div id="reportResult" style="margin-top:12px"></div></div>
+<div class="panel"><h2>ডাটা ব্যাকআপ</h2><p class="muted">ডিভাইস বদলালে বা ব্রাউজারের ডাটা মুছে গেলে ব্যাকআপ ফাইল দিয়ে হিসাব ফেরত আনুন।</p>
+<div class="grid2"><button class="secondary" id="exportBtn">ব্যাকআপ ডাউনলোড</button><button class="secondary" id="importBtn">ব্যাকআপ ফেরত আনুন</button></div><input type="file" id="importFile" accept="application/json" class="hidden"></div>
+</section>
+
+<section id="settings" class="tab hidden">
+<div class="panel"><h2>⚙️ নিজের তালিকা তৈরি</h2>
+<label>নতুন পণ্যের নাম</label><div class="grid2"><input id="newProduct" placeholder="যেমন: বাসমতি চাল"><button class="secondary" id="addProduct">পণ্য যোগ</button></div>
+<label>নতুন খরচের বিভাগ</label><div class="grid2"><input id="newCategory" placeholder="যেমন: অতিথি আপ্যায়ন"><button class="secondary" id="addCategory">বিভাগ যোগ</button></div>
+<label>নতুন টাকা রাখার মাধ্যম</label><div class="grid2"><input id="newMethod" placeholder="যেমন: অন্য ওয়ালেট"><button class="secondary" id="addMethod">মাধ্যম যোগ</button></div>
+<div id="listStatus" class="muted" style="margin-top:10px"></div></div>
+<div class="panel"><h2>তথ্য সংরক্ষণ</h2><p class="muted">এই অ্যাপের তথ্য এই ফোনের এই ব্রাউজারেই সংরক্ষিত থাকে। নিয়মিত ব্যাকআপ ডাউনলোড করে রাখুন।</p><button class="danger" id="clearData">সব হিসাব মুছে ফেলুন</button></div>
+</section>
+<footer>পারিবারিক হিসাব • তথ্য আপনার ডিভাইসের ব্রাউজারে সংরক্ষিত</footer>
+</main>
+<script>
+const KEY='familyLedgerBn_v1';
+const defaultData={
+ methods:['হাতে নগদ','বিকাশ','রকেট','নগদ (Nagad)','ব্যাংক একাউন্ট','উপায়','অন্য ওয়ালেট','অন্যান্য'],
+ categories:['সংসার/বাজার','চাল-চালজাত পণ্য','ডাল ও ডালজাত পণ্য','আটা-ময়দা-সুজি','তেল ও ঘি','মসলা','লবণ-চিনি','মাছ','মাংস','মুরগি ও ডিম','দুধ ও দুগ্ধজাত পণ্য','সবজি','ফলমূল','মুদি ও শুকনো খাবার','নাস্তা ও বিস্কুট','পানীয়','রান্নার গ্যাস/জ্বালানি','পরিষ্কার-পরিচ্ছন্নতা','সাবান-শ্যাম্পু','গৃহস্থালি','ব্যান্ডপার্টি','ডেকোরেশন','লাইটিং/সাউন্ড','ফটোগ্রাফি/ভিডিও','খাবার পরিবেশন/ক্যাটারিং','রান্নার বাবুর্চি','শ্রমিক/মজুরি','যাতায়াত/ভাড়া','অতিথি আপ্যায়ন','উপহার/বকশিশ','চিকিৎসা/ওষুধ','শিক্ষা/স্টেশনারি','মোবাইল/ইন্টারনেট','অন্যান্য'],
+ products:['মিনিকেট চাল','নাজিরশাইল চাল','স্বর্ণা চাল','আটাশ চাল','চিনিগুঁড়া চাল','বাসমতি চাল','মসুর ডাল','মুগ ডাল','মাসকলাই ডাল','ছোলা','আটা','ময়দা','সুজি','সয়াবিন তেল','সরিষার তেল','ঘি','হলুদ গুঁড়া','মরিচ গুঁড়া','ধনিয়া গুঁড়া','জিরা গুঁড়া','লবণ','চিনি','পেঁয়াজ','রসুন','আদা','রুই মাছ','কাতলা মাছ','ইলিশ মাছ','চিংড়ি','গরুর মাংস','খাসির মাংস','মুরগি','ডিম','দুধ','আলু','পটল','বেগুন','লাউ','টমেটো','কলা','আপেল','কমলা','চা পাতা','বিস্কুট','নুডলস','এলপিজি গ্যাস','ডিটারজেন্ট','ডিশওয়াশ','সাবান','শ্যাম্পু','টুথপেস্ট','প্লেট','গ্লাস','হাঁড়ি','বাল্ব','ব্যান্ডপার্টি','ডেকোরেশন সামগ্রী','ফুল','লাইটিং','সাউন্ড সিস্টেম','চেয়ার ভাড়া','তাঁবু/প্যান্ডেল','ফটোগ্রাফার','বাবুর্চি','রিকশা ভাড়া','বাস ভাড়া'],
+ incomes:[], expenses:[], transfers:[]
+};
+let data;
+try{data={...defaultData,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){data=structuredClone(defaultData)}
+const $=id=>document.getElementById(id);
+const money=n=>'৳'+(Number(n)||0).toLocaleString('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fillSelect(id,items,allLabel){const el=$(id);if(!el)return;const old=el.value;el.innerHTML=(allLabel?`<option value="">${allLabel}</option>`:'')+items.map(x=>`<option>${esc(x)}</option>`).join('');if(items.includes(old))el.value=old}
+function initDates(){['inDate','exDate','trDate'].forEach(id=>$(id).value=today())}
+function totals(){let inc=data.incomes.reduce((s,x)=>s+x.amount,0),exp=data.expenses.reduce((s,x)=>s+x.amount,0),fee=data.transfers.reduce((s,x)=>s+x.fee,0);return{inc,exp,fee,balance:inc-exp-fee}}
+function methodStats(m){let inc=data.incomes.filter(x=>x.method===m).reduce((s,x)=>s+x.amount,0),out=data.transfers.filter(x=>x.from===m).reduce((s,x)=>s+x.amount,0),got=data.transfers.filter(x=>x.to===m).reduce((s,x)=>s+x.amount-x.fee,0),exp=data.expenses.filter(x=>x.method===m).reduce((s,x)=>s+x.amount,0);return{inc,out,got,exp,balance:inc-out+got-exp}}
+function table(headers,rows){if(!rows.length)return '<div class="empty">এখনো কোনো তথ্য যোগ করা হয়নি</div>';return `<div class="tablewrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
+function actionButtons(type,id){return `<span class="item-actions"><button onclick="delItem('${type}','${id}')">মুছুন</button></span>`}
+function render(){
+let t=totals();$('totalIn').textContent=money(t.inc);$('totalOut').textContent=money(t.exp);$('totalFee').textContent=money(t.fee);$('balance').textContent=money(t.balance);
+$('methodRows').innerHTML=data.methods.map(m=>{let s=methodStats(m);return `<tr><td>${esc(m)}</td><td>${money(s.inc)}</td><td>${money(s.got)}</td><td>${money(s.out)}</td><td>${money(s.exp)}</td><td><b>${money(s.balance)}</b></td></tr>`}).join('');
+let all=[...data.incomes.map(x=>({...x,type:'জমা',desc:x.desc,amt:x.amount})),...data.expenses.map(x=>({...x,type:'খরচ',desc:x.product,amt:x.amount})),...data.transfers.map(x=>({...x,type:'উত্তোলন',desc:x.from+' → '+x.to,amt:x.amount}))].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+$('recent').innerHTML=table(['তারিখ','ধরন','বিবরণ','টাকা'],all.map(x=>`<tr><td>${esc(x.date)}</td><td><span class="pill">${x.type}</span></td><td>${esc(x.desc)}</td><td>${money(x.amt)}</td></tr>`));
+$('incomeList').innerHTML=table(['তারিখ','বিবরণ','মাধ্যম','টাকা',''],[...data.incomes].reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.desc)}</td><td>${esc(x.method)}</td><td>${money(x.amount)}</td><td>${actionButtons('incomes',x.id)}</td></tr>`));
+let cf=$('filterCat')?.value||'',pf=$('filterProduct')?.value?.toLowerCase()||'';
+let exs=data.expenses.filter(x=>(!cf||x.category===cf)&&(!pf||x.product.toLowerCase().includes(pf)));
+$('expenseList').innerHTML=table(['তারিখ','বিভাগ','পণ্য/কাজ','বিবরণ','পরিমাণ','দর','মোট','মাধ্যম',''],[...exs].reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.category)}</td><td>${esc(x.product)}</td><td>${esc(x.detail)}</td><td>${x.qty?esc(x.qty)+' '+esc(x.unit):'—'}</td><td>${x.rate?money(x.rate):'—'}</td><td><b>${money(x.amount)}</b></td><td>${esc(x.method)}</td><td>${actionButtons('expenses',x.id)}</td></tr>`));
+$('transferList').innerHTML=table(['তারিখ','উৎস','প্রাপ্তির মাধ্যম','উঠানো','চার্জ','প্রাপ্ত',''],[...data.transfers].reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.from)}</td><td>${esc(x.to)}</td><td>${money(x.amount)}</td><td>${money(x.fee)}</td><td>${money(x.amount-x.fee)}</td><td>${actionButtons('transfers',x.id)}</td></tr>`));
+fillSelect('inMethod',data.methods);fillSelect('exMethod',data.methods);fillSelect('trFrom',data.methods);fillSelect('trTo',data.methods);fillSelect('exCategory',data.categories);fillSelect('filterCat',data.categories,'সব বিভাগ');
+$('productOptions').innerHTML=data.products.map(p=>`<option value="${esc(p)}">`).join('');
+}
+window.delItem=(type,id)=>{if(confirm('এই লেনদেনটি মুছে ফেলবেন?')){data[type]=data[type].filter(x=>x.id!==id);save()}};
+function add(form,type,obj){$(form).addEventListener('submit',e=>{e.preventDefault();data[type].push({id:crypto.randomUUID(),...obj()});save();$(form).reset();initDates();alert('তথ্য সংরক্ষণ হয়েছে')})}
+add('incomeForm','incomes',()=>({date:$('inDate').value,method:$('inMethod').value,desc:$('inDesc').value.trim(),amount:+$('inAmount').value,ref:$('inRef').value,note:$('inNote').value}));
+add('expenseForm','expenses',()=>({date:$('exDate').value,category:$('exCategory').value,product:$('exProduct').value.trim(),detail:$('exDetail').value,qty:+$('exQty').value||0,unit:$('exUnit').value,rate:+$('exRate').value||0,amount:+$('exAmount').value,method:$('exMethod').value,who:$('exWho').value,ref:$('exRef').value,note:$('exNote').value}));
+add('transferForm','transfers',()=>({date:$('trDate').value,from:$('trFrom').value,to:$('trTo').value,amount:+$('trAmount').value,fee:+$('trFee').value||0,ref:$('trRef').value,note:$('trNote').value}));
+function calcExpense(){let q=+$('exQty').value,r=+$('exRate').value;if(q>0&&r>=0)$('exAmount').value=(q*r).toFixed(2)}
+$('exQty').addEventListener('input',calcExpense);$('exRate').addEventListener('input',calcExpense);
+$('filterCat').addEventListener('change',render);$('filterProduct').addEventListener('input',render);
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('hidden',x.id!==b.dataset.tab));}));
+$('addProduct').onclick=()=>{let v=$('newProduct').value.trim();if(v&&!data.products.includes(v)){data.products.push(v);save();$('newProduct').value='';$('listStatus').textContent='নতুন পণ্য যোগ হয়েছে: '+v}else $('listStatus').textContent='নাম লিখুন অথবা আগে থেকেই আছে কিনা দেখুন'};
+$('addCategory').onclick=()=>{let v=$('newCategory').value.trim();if(v&&!data.categories.includes(v)){data.categories.push(v);save();$('newCategory').value='';$('listStatus').textContent='নতুন বিভাগ যোগ হয়েছে: '+v}else $('listStatus').textContent='নাম লিখুন অথবা আগে থেকেই আছে কিনা দেখুন'};
+$('addMethod').onclick=()=>{let v=$('newMethod').value.trim();if(v&&!data.methods.includes(v)){data.methods.push(v);save();$('newMethod').value='';$('listStatus').textContent='নতুন মাধ্যম যোগ হয়েছে: '+v}else $('listStatus').textContent='নাম লিখুন অথবা আগে থেকেই আছে কিনা দেখুন'};
+$('runReport').onclick=()=>{let f=$('reportFrom').value,t=$('reportTo').value,filter=x=>(!f||x.date>=f)&&(!t||x.date<=t),inc=data.incomes.filter(filter).reduce((s,x)=>s+x.amount,0),exp=data.expenses.filter(filter).reduce((s,x)=>s+x.amount,0),fee=data.transfers.filter(filter).reduce((s,x)=>s+x.fee,0);$('reportResult').innerHTML=`<div class="cards"><div class="card blue"><small>জমা</small><strong>${money(inc)}</strong></div><div class="card red"><small>খরচ</small><strong>${money(exp)}</strong></div><div class="card gold"><small>চার্জ</small><strong>${money(fee)}</strong></div><div class="card green"><small>নিট</small><strong>${money(inc-exp-fee)}</strong></div></div>`};
+$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='পারিবারিক-হিসাব-ব্যাকআপ.json';a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{let file=e.target.files[0];if(!file)return;try{let x=JSON.parse(await file.text());if(!x.incomes||!x.expenses||!x.transfers)throw Error();data={...defaultData,...x};save();alert('ব্যাকআপ ফেরত আনা হয়েছে')}catch(err){alert('এই ব্যাকআপ ফাইলটি সঠিক নয়')}};
+$('clearData').onclick=()=>{if(confirm('সতর্কতা: সব জমা, খরচ ও উত্তোলনের হিসাব মুছে যাবে। আগে ব্যাকআপ নিয়েছেন?')){data={...defaultData,incomes:[],expenses:[],transfers:[]};save();alert('সব হিসাব মুছে ফেলা হয়েছে')}};
+initDates();render();
+</script>
+ <script>
+ if ("serviceWorker" in navigator && location.protocol !== "file:") {
+   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));
+ }
+ </script>
+</body></html>
